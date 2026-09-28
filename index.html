@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171717">
+  <title>유전질환 탐구 | 네 가지 질환 비교</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      color: #171717;
+      background: #f5f5f3;
+      font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; }
+    a { color: #205f7a; }
+    a:hover { color: #124157; }
+    :focus-visible { outline: 3px solid #e6a540; outline-offset: 3px; }
+    .app { min-height: 100vh; }
+    .topbar { position: sticky; top: 0; z-index: 10; background: #171717; color: #fff; border-bottom: 1px solid #363636; }
+    .topbar-inner {
+      max-width: 1320px;
+      min-height: 72px;
+      margin: auto;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand { flex: none; }
+    .brand-name { font-size: 17px; font-weight: 750; white-space: nowrap; }
+    .disease-nav { display: flex; align-self: stretch; }
+    .disease-tab {
+      min-height: 72px; padding: 0 15px; border: 0; border-bottom: 2px solid transparent;
+      border-radius: 0; background: transparent; color: #a8a8a8; text-align: center;
+      display: flex; align-items: center; gap: 7px; cursor: pointer;
+      transition: color .15s, border-color .15s;
+    }
+    .disease-tab:hover { color: #fff; }
+    .disease-tab[aria-selected="true"] { border-color: var(--tab-accent); color: #fff; }
+    .tab-number { font-size: 11px; font-weight: 700; color: #858585; }
+    .disease-tab[aria-selected="true"] .tab-number { color: var(--tab-accent); }
+    .tab-text { min-width: 0; }
+    .tab-name { font-size: 13px; font-weight: 700; line-height: 1.35; word-break: keep-all; }
+    .content { min-width: 0; --accent: #117a73; }
+    .hero { position: relative; width: 100%; min-height: 540px; height: min(70svh, 720px); overflow: hidden; background: #151515; color: #fff; }
+    .hero-media, .hero-shade { position: absolute; inset: 0; }
+    .hero-media img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .hero-shade { background: linear-gradient(90deg, rgba(0,0,0,.86) 0%, rgba(0,0,0,.62) 36%, rgba(0,0,0,.05) 75%); }
+    .hero-inner { position: relative; z-index: 1; max-width: 1320px; height: 100%; margin: auto; padding: 46px 28px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+    .detail-kicker { color: #fff; border-left: 4px solid var(--accent); padding-left: 12px; font-size: 14px; font-weight: 800; }
+    .hero h1 { max-width: 670px; margin: 22px 0 10px; font-size: 64px; line-height: 1.15; letter-spacing: 0; word-break: keep-all; }
+    .english { margin: 0; font-size: 15px; color: #cfcfcf; }
+    .hero-summary { max-width: 590px; margin: 26px 0 0; font-size: 18px; line-height: 1.65; word-break: keep-all; }
+    .hero-caption { margin: 0; padding: 13px max(28px, calc((100vw - 1264px) / 2)); background: #171717; color: #bcbcbc; font-size: 12px; line-height: 1.6; }
+    .hero-caption a { color: #fff; text-underline-offset: 3px; }
+    .detail-body { max-width: 1120px; margin: auto; padding: 88px 28px 0; }
+    .facts {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin: 0; padding: 40px max(28px, calc((100vw - 1064px) / 2));
+      background: #171717; color: #fff;
+    }
+    .fact { padding: 0 24px 0 0; min-width: 0; }
+    .fact + .fact { border-left: 1px solid #434343; padding-left: 24px; }
+    .fact-label { display: block; color: #a5a5a5; font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+    .fact-value { display: block; color: #fff; font-size: 24px; font-weight: 750; line-height: 1.4; word-break: keep-all; }
+    .section-list { border-top: 1px solid #d8d8d6; }
+    .info-section {
+      display: grid; grid-template-columns: minmax(230px, 340px) minmax(0, 1fr); gap: 55px;
+      border-bottom: 1px solid #d8d8d6; padding: 52px 0;
+    }
+    .info-section h2 { margin: 0; font-size: 30px; line-height: 1.3; font-weight: 750; word-break: keep-all; }
+    .info-number { display: block; margin-bottom: 15px; color: var(--accent); font-size: 13px; font-weight: 800; }
+    .info-section p { margin: 0; color: #252525; font-size: 18px; line-height: 1.65; word-break: keep-all; }
+    .info-section ul { margin: 20px 0 0; padding: 0 0 0 19px; color: #555; font-size: 16px; line-height: 1.72; }
+    .info-section li { padding-left: 5px; margin: 7px 0; word-break: keep-all; }
+    .info-section li::marker { color: var(--accent); }
+    .takeaway { margin-top: 76px; padding: 32px 0 0; border-top: 4px solid var(--accent); }
+    .takeaway-label { display: block; color: var(--accent); font-size: 13px; font-weight: 800; margin-bottom: 13px; }
+    .takeaway p { max-width: 860px; margin: 0; color: #181818; font-size: 26px; font-weight: 650; line-height: 1.45; word-break: keep-all; }
+    .sources { margin-top: 76px; padding-top: 24px; border-top: 1px solid #d8d8d6; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; }
+    .sources-label { color: #666; font-size: 13px; font-weight: 750; }
+    .sources a { font-size: 13px; font-weight: 700; text-underline-offset: 3px; }
+    .disclaimer { margin: 22px 0 0; color: #666; font-size: 12px; line-height: 1.65; }
+    @media (max-width: 900px) {
+      .topbar-inner { display: block; padding: 0 18px; }
+      .brand { height: 54px; display: flex; align-items: center; }
+      .disease-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .disease-tab { width: 100%; min-height: 53px; justify-content: center; padding: 8px 4px; }
+      .tab-number { display: none; }
+      .tab-name { font-size: 12px; }
+      .hero h1 { font-size: 48px; }
+      .hero-summary { font-size: 16px; max-width: 480px; }
+      .info-section { grid-template-columns: minmax(180px, 270px) minmax(0, 1fr); gap: 32px; }
+      .info-section h2 { font-size: 26px; }
+    }
+    @media (max-width: 680px) {
+      .topbar { position: static; }
+      .disease-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .disease-tab { min-height: 42px; border-top: 1px solid #363636; }
+      .hero { min-height: 440px; height: 60svh; }
+      .hero-media img { object-position: 62% center; }
+      .hero-shade { background: linear-gradient(0deg, rgba(0,0,0,.9) 0%, rgba(0,0,0,.42) 62%, rgba(0,0,0,.08) 100%); }
+      .hero-inner { padding: 26px 18px 34px; justify-content: flex-end; }
+      .hero h1 { font-size: 34px; }
+      .english { font-size: 12px; }
+      .hero-summary { font-size: 14px; margin-top: 16px; }
+      .hero-caption { padding: 12px 18px; font-size: 11px; }
+      .facts { padding: 25px 18px; }
+      .fact { padding-right: 9px; }
+      .fact + .fact { padding-left: 9px; }
+      .fact-label { font-size: 10px; }
+      .fact-value { font-size: 14px; }
+      .detail-body { padding: 48px 18px 0; }
+      .info-section { display: block; padding: 33px 0; }
+      .info-section h2 { margin-bottom: 16px; font-size: 24px; }
+      .info-number { margin-bottom: 10px; }
+      .info-section p { font-size: 16px; }
+      .info-section ul { font-size: 14px; }
+      .takeaway { margin-top: 50px; }
+      .takeaway p { font-size: 21px; }
+      .sources { margin-top: 52px; }
+    }
+    @media (max-width: 360px) {
+      .hero h1 { font-size: 30px; }
+      .fact-value { font-size: 13px; }
+    }
+    /* Exhibition layout */
+    body { background: #ecece8; }
+    .topbar { background: #f5f5f1; color: #171717; border-bottom: 1px solid #d5d5d0; }
+    .topbar-inner { max-width: none; min-height: 76px; padding: 0 3.2vw; }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand-mark { width: 26px; height: 26px; border: 1.5px solid #171717; border-radius: 50%; position: relative; flex: none; }
+    .brand-mark::before, .brand-mark::after { content: ""; position: absolute; background: #171717; }
+    .brand-mark::before { width: 1px; height: 30px; left: 12px; top: -3px; transform: rotate(35deg); }
+    .brand-mark::after { width: 30px; height: 1px; left: -3px; top: 12px; transform: rotate(35deg); }
+    .brand-name { font-size: 15px; font-weight: 850; letter-spacing: 0; }
+    .brand-sub { display: block; margin-top: 3px; font-size: 10px; color: #64645f; font-weight: 650; }
+    .disease-nav { gap: 2px; }
+    .disease-tab { min-height: 76px; padding: 0 18px; color: #666761; border-bottom-width: 3px; transition: color .25s, background .25s, border-color .25s; }
+    .disease-tab:hover { color: #171717; background: #eaeae5; }
+    .disease-tab[aria-selected="true"] { color: #171717; background: #eaeae5; }
+    .tab-number { color: #777; }
+    .disease-tab[aria-selected="true"] .tab-number { color: var(--tab-accent); }
+    .reading-progress { position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background: transparent; overflow: hidden; }
+    .reading-progress span { display: block; height: 100%; width: 100%; background: var(--progress-accent, #117a73); transform: scaleX(0); transform-origin: left; }
+    .content { background: #f5f5f1; }
+    .hero { height: min(81svh, 840px); min-height: 610px; }
+    .hero-media { overflow: hidden; }
+    .hero-media img { animation: image-arrive 1.5s cubic-bezier(.18,.72,.22,1) both; object-position: center; }
+    .hero-shade { background: linear-gradient(90deg, rgba(0,0,0,.78), rgba(0,0,0,.24) 62%, rgba(0,0,0,.08)), linear-gradient(0deg, rgba(0,0,0,.53), transparent 32%); }
+    .hero::before, .hero::after { content: ""; position: absolute; z-index: 1; pointer-events: none; background: rgba(255,255,255,.3); }
+    .hero::before { top: 77px; left: 3.2vw; right: 3.2vw; height: 1px; }
+    .hero::after { top: 0; bottom: 0; right: 3.2vw; width: 1px; opacity: .45; }
+    .hero-inner { max-width: none; padding: 36px 3.2vw 45px; justify-content: space-between; }
+    .hero-topline, .hero-bottomline { width: 100%; display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+    .hero-topline { font-size: 11px; font-weight: 750; color: #f3f3f0; text-transform: uppercase; }
+    .hero-topline span:last-child { text-align: right; }
+    .hero-copy { margin: auto 0 0; padding: 52px 0 46px; width: min(900px, 85%); animation: text-arrive .9s .12s both; }
+    .detail-kicker { border-left: 0; padding-left: 0; color: #e7e7e4; font-size: 12px; font-weight: 750; }
+    .hero h1 { max-width: 860px; margin: 18px 0 10px; font-size: clamp(48px, 6.6vw, 104px); line-height: 1.07; font-weight: 850; letter-spacing: 0; }
+    .english { font-size: 14px; font-weight: 600; color: #e4e4df; }
+    .hero-summary { max-width: 650px; margin-top: 28px; font-size: 18px; line-height: 1.58; color: #f0f0ed; }
+    .hero-bottomline { align-items: flex-end; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.5); font-size: 11px; font-weight: 750; }
+    .hero-scroll { display: inline-flex; gap: 16px; align-items: center; color: #fff; text-decoration: none; }
+    .hero-scroll:hover { color: #fff; }
+    .scroll-arrow { font-size: 25px; font-weight: 400; animation: arrow-bob 2.2s ease-in-out infinite; }
+    .hero-count { color: #e5e5e0; }
+    .hero-caption { background: #1b1b1a; padding: 12px 3.2vw; }
+    .facts { padding: 36px 3.2vw; background: #1b1b1a; }
+    .fact { padding-left: 24px; border-left: 2px solid var(--accent); }
+    .fact + .fact { border-left: 1px solid #53534f; padding-left: 28px; }
+    .fact-label { color: #aeadab; font-size: 11px; letter-spacing: 0; }
+    .fact-value { font-size: clamp(18px, 2.1vw, 28px); }
+    .detail-body { max-width: none; padding: 0 3.2vw 80px; }
+    #information { scroll-margin-top: 76px; }
+    .chapter-intro { min-height: 320px; display: grid; grid-template-columns: 1fr 1.4fr; align-items: end; gap: 30px; padding: 96px 0 53px; }
+    .chapter-label { align-self: start; color: var(--accent); font-size: 12px; font-weight: 850; }
+    .chapter-intro h2 { margin: 0; max-width: 790px; font-size: clamp(36px, 4.5vw, 72px); line-height: 1.12; font-weight: 790; word-break: keep-all; }
+    .section-list { border-color: #b6b6ae; }
+    .info-section { grid-template-columns: minmax(260px, 42%) minmax(0, 1fr); gap: 6%; padding: 66px 0 72px; border-color: #c8c8c1; }
+    .info-section h2 { font-size: clamp(30px, 3.1vw, 48px); line-height: 1.18; }
+    .info-number { margin-bottom: 38px; color: var(--accent); font-size: 12px; letter-spacing: 0; }
+    .info-section p { max-width: 780px; font-size: clamp(19px, 1.8vw, 25px); line-height: 1.48; font-weight: 650; }
+    .info-section ul { max-width: 760px; margin-top: 27px; font-size: 16px; color: #4d4d49; }
+    .info-section li { margin: 11px 0; }
+    .reveal { opacity: 0; transform: translateY(36px); transition: opacity .75s ease, transform .75s cubic-bezier(.2,.75,.2,1); }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+    .takeaway { margin-top: 0; padding: 88px 0; border-top: 1px solid #c8c8c1; display: grid; grid-template-columns: 42% 1fr; gap: 6%; }
+    .takeaway-label { font-size: 12px; }
+    .takeaway p { font-size: clamp(25px, 2.7vw, 40px); line-height: 1.34; }
+    .sources { margin: 0; padding: 31px 0 0; border-color: #c8c8c1; }
+    .next-exhibit { width: 100%; margin-top: 80px; padding: 30px 0; border: 0; border-top: 1px solid #c8c8c1; border-bottom: 1px solid #c8c8c1; background: transparent; color: #171717; display: grid; grid-template-columns: 42% 1fr auto; align-items: center; gap: 6%; text-align: left; cursor: pointer; transition: background .25s, padding .25s; }
+    .next-exhibit:hover { background: #e9e9e3; padding-left: 12px; padding-right: 12px; }
+    .next-label { font-size: 12px; color: #5e5e59; font-weight: 800; }
+    .next-name { font-size: clamp(22px, 2.7vw, 36px); font-weight: 770; word-break: keep-all; }
+    .next-arrow { font-size: 32px; font-weight: 400; }
+    @keyframes image-arrive { from { transform: scale(1.07); opacity: .65; } to { transform: scale(1); opacity: 1; } }
+    @keyframes text-arrive { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes arrow-bob { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(4px); } }
+    @media (max-width: 900px) {
+      .topbar-inner { display: block; padding: 0 20px; }
+      .brand { height: 56px; }
+      .disease-tab { min-height: 56px; padding: 8px 5px; }
+      .hero { min-height: 620px; height: 74svh; }
+      .hero-inner { padding: 30px 20px 36px; }
+      .hero::before { left: 20px; right: 20px; top: 67px; }
+      .hero::after { right: 20px; }
+      .hero h1 { font-size: clamp(48px, 7vw, 68px); }
+      .hero-caption, .facts { padding-left: 20px; padding-right: 20px; }
+      .detail-body { padding-left: 20px; padding-right: 20px; }
+    }
+    @media (max-width: 680px) {
+      .topbar { position: sticky; }
+      .topbar-inner { padding: 0 14px; }
+      .brand { height: 48px; }
+      .brand-name { font-size: 13px; }
+      .brand-sub { display: none; }
+      .brand-mark { width: 22px; height: 22px; }
+      .brand-mark::before { left: 10px; top: -5px; }
+      .brand-mark::after { left: -5px; top: 10px; }
+      .disease-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; }
+      .disease-tab { min-height: 42px; border-top: 1px solid #d5d5d0; }
+      .tab-name { font-size: 11px; }
+      .hero { min-height: 390px; height: 60svh; }
+      .hero-shade { background: linear-gradient(0deg, rgba(0,0,0,.86), rgba(0,0,0,.16) 90%); }
+      .hero-media img { object-position: 58% center; }
+      .hero-inner { padding: 22px 18px 24px; }
+      .hero::before { top: 56px; left: 18px; right: 18px; }
+      .hero::after { right: 18px; }
+      .hero-topline { font-size: 9px; }
+      .hero-copy { width: 100%; padding: 40px 0 32px; }
+      .detail-kicker { font-size: 10px; }
+      .hero h1 { font-size: clamp(36px, 10vw, 56px); }
+      .english { font-size: 12px; }
+      .hero-summary { margin-top: 20px; font-size: 14px; }
+      .hero-bottomline { font-size: 10px; }
+      .hero-caption { padding: 10px 18px; }
+      .facts { display: block; padding: 15px 18px; }
+      .fact, .fact + .fact { display: grid; grid-template-columns: 115px 1fr; align-items: center; min-height: 54px; padding: 8px 0; border-left: 0; border-bottom: 1px solid #4a4a45; }
+      .fact:last-child { border-bottom: 0; }
+      .fact-label { margin: 0; }
+      .fact-value { font-size: 16px; }
+      .detail-body { padding: 0 18px 56px; }
+      #information { scroll-margin-top: 138px; }
+      .chapter-intro { min-height: 250px; display: block; padding: 60px 0 40px; }
+      .chapter-label { display: block; margin-bottom: 42px; }
+      .chapter-intro h2 { font-size: 37px; }
+      .info-section { display: block; padding: 42px 0 48px; }
+      .info-number { margin-bottom: 22px; }
+      .info-section h2 { margin-bottom: 28px; font-size: 32px; }
+      .info-section p { font-size: 19px; }
+      .info-section ul { font-size: 15px; }
+      .takeaway { display: block; padding: 48px 0; }
+      .takeaway-label { margin-bottom: 28px; }
+      .takeaway p { font-size: 27px; }
+      .next-exhibit { grid-template-columns: 1fr auto; gap: 12px; margin-top: 54px; }
+      .next-label { grid-column: 1 / -1; }
+      .next-name { font-size: 25px; }
+    }
+    @media (max-width: 360px) { .hero h1 { font-size: 34px; } .chapter-intro h2 { font-size: 32px; } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+    @media print {
+      body { background: #fff; }
+      .topbar { position: static; border: 0; color: #000; background: #fff; }
+      .disease-nav { display: none; }
+      .hero { height: 360px; min-height: 360px; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .info-section { break-inside: avoid; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span><span class="brand-name">유전질환 탐구</span><span class="brand-sub">GENETIC CONDITIONS / 04 EXHIBITS</span></span></div>
+        <nav class="disease-nav" role="tablist" aria-label="유전질환 선택"></nav>
+      </div>
+      <div class="reading-progress" aria-hidden="true"><span></span></div>
+    </header>
+    <main class="content" id="disease-panel" role="tabpanel" tabindex="0" aria-live="polite"></main>
+  </div>
+  <script>
+    const conditions = [
+      {
+        id: "vhl", name: "폰히펠-린다우병", english: "Von Hippel-Lindau disease", gene: "VHL", kind: "여러 장기를 살피는 유전질환",
+        accent: "#117a73",
+        summary: "VHL 종양 억제 유전자의 변화로 눈, 뇌, 척수, 신장 등 여러 장기에 종양이나 낭종이 생길 위험이 높아지는 유전질환입니다.",
+        facts: ["VHL", "상염색체 우성", "정기적 종양 감시"],
+        heroPhoto: "assets/vhl-hero-medical.jpg", heroAlt: "뇌 MRI 검사 장면을 표현한 의학 교육용 이미지",
+        clinicalSource: "https://commons.wikimedia.org/wiki/File:Hippel_angiogram.jpg",
+        sections: [
+          ["유전적 원인", "VHL 유전자는 세포의 과도한 성장을 억제합니다. 이 유전자에 병적 변화가 생기면 여러 장기에 종양이나 낭종이 생길 위험이 높아집니다.", ["태어날 때부터 VHL 유전자 한 사본에 변화가 있을 수 있습니다.", "일부 세포에서 나머지 정상 사본에도 변화가 생기면 종양 형성과 연결될 수 있습니다."]],
+          ["유전 방식", "상염색체 우성 유전으로, 부모 중 한 사람이 병적 변이를 가지고 있으면 자녀에게 전달될 확률은 임신마다 50%입니다.", ["가족에게서 물려받지 않고 새로운 유전적 변화로 발생하는 경우도 있습니다.", "가족력이 있거나 유전자 변이가 확인되면 가족 검사와 유전 상담을 의료진과 상의할 수 있습니다."]],
+          ["주요 증상·특징", "눈과 뇌, 척수의 혈관모세포종을 비롯해 여러 장기에 양성 또는 악성 병변이 나타날 수 있습니다.", ["망막 병변은 시력에, 뇌와 척수 병변은 두통이나 운동 조절에 영향을 줄 수 있습니다.", "신장에는 낭종이나 신장암이, 췌장에는 낭종이나 종양이 생길 수 있습니다. 부신의 갈색세포종은 고혈압과 관련될 수 있습니다.", "증상의 종류와 나타나는 시기는 개인마다 다릅니다."]],
+          ["진단 방법", "가족력과 특징적인 병변을 살피고, VHL 유전자 검사로 유전적 원인을 확인합니다.", ["안과 검사로 망막을 확인하고 MRI나 CT 등으로 뇌, 척수, 복부 장기를 평가합니다.", "필요에 따라 청력 검사와 혈액 또는 소변 검사를 추가합니다.", "특정 나이 이전에는 진단할 수 없다고 단정할 수 없습니다."]],
+          ["치료·관리 방법", "질환 자체를 한 번에 없애기보다 새로운 병변을 조기에 발견하고 장기 기능을 지키는 데 중점을 둡니다.", ["눈, 뇌, 척수, 신장, 췌장 등을 평생 정기적으로 살핍니다.", "병변의 위치와 상태에 따라 수술, 레이저나 방사선 등의 국소 치료를 고려합니다.", "일부 상황에서는 전문의가 약물치료를 검토할 수 있습니다."]]
+        ],
+        takeaway: "모든 종양이 암인 것은 아니지만, 일부 장기에서는 암 위험이 있으므로 증상이 없어도 정기 검진이 중요합니다.",
+        sources: [
+          ["MSD 매뉴얼 일반인용", "https://www.msdmanuals.com/ko/home/%EC%95%84%EB%8F%99%EC%9D%98-%EA%B1%B4%EA%B0%95-%EB%AC%B8%EC%A0%9C/%EC%86%8C%EC%95%84%EC%9D%98-%EC%8B%A0%EA%B2%BD%ED%94%BC%EB%B6%80-%EC%A6%9D%ED%9B%84%EA%B5%B0/%ED%8F%B0%ED%9E%88%ED%8E%A0-%EB%A6%B0%EB%8B%A4%EC%9A%B0%EB%B3%91-vhl"],
+          ["서울아산병원 질환백과", "https://www.amc.seoul.kr/asan/healthinfo/disease/diseaseDetail.do?contentId=32421"],
+          ["지역사회 건강 도서관", "https://www.chcrr.org/ko/health-topic/von-hippel-lindau-disease/"]
+        ]
+      },
+      {
+        id: "galactosemia", name: "갈락토스혈증", english: "Galactosemia", gene: "GALT 등", kind: "갈락토스 대사 질환",
+        accent: "#a56724",
+        summary: "갈락토스 대사에 필요한 효소의 기능이 떨어지는 유전질환입니다. GALT, GALK1, GALE 유전자에 따라 유형과 증상이 달라집니다.",
+        facts: ["GALT / GALK1 / GALE", "상염색체 열성", "유형별 식이·발달 관리"],
+        heroPhoto: "assets/galactosemia-hero-medical.jpg", heroAlt: "신생아 선별검사 혈액점 카드를 표현한 의학 교육용 이미지",
+        clinicalSource: "https://pmc.ncbi.nlm.nih.gov/articles/PMC6786172/",
+        sections: [
+          ["유전적 원인", "갈락토스를 처리하는 효소의 기능이 낮아져 갈락토스나 관련 대사물질이 몸에 쌓일 수 있습니다.", ["제1형인 고전형은 GALT 유전자 변화로 GALT 효소가 부족해집니다.", "제2형은 GALK1 유전자 변화로 갈락토키나아제의 기능이 낮아집니다.", "제3형은 GALE 유전자 변화로 UDP-갈락토스-4-에피머라제의 기능이 낮아집니다."]],
+          ["유전 방식", "세 유형 모두 대체로 상염색체 열성 방식으로 유전됩니다.", ["보통 부모에게서 병적 유전자 변화를 하나씩 물려받아 두 사본이 모두 영향을 받을 때 발병합니다.", "원인 유전자가 서로 다르므로 같은 이름의 질환이라도 유형을 구별해야 합니다."]],
+          ["주요 증상·특징", "고전형은 출생 직후 뚜렷한 증상이 없다가 수유를 시작한 뒤 빠르게 문제가 나타날 수 있습니다.", ["수유 곤란, 구토, 기운 없음, 체중 증가 부진, 황달과 간 기능 이상이 대표적입니다.", "치료가 늦어지면 백내장이나 심각한 감염이 생길 수 있고, 이후에도 발달과 학습을 살펴야 합니다.", "제2형은 백내장이 두드러질 수 있습니다. 제3형은 경미한 경우부터 전신 증상이 있는 경우까지 차이가 큽니다."]],
+          ["진단 방법", "신생아 선별검사에서 이상이 나오면 혈액의 대사물질과 효소 활성을 검사해 유형을 확인합니다.", ["갈락토스와 갈락토스-1-인산 등의 농도를 측정할 수 있습니다.", "의심되는 유형에 따라 GALT, GALK1 또는 GALE 효소 활성과 관련 유전자를 검사합니다.", "소변의 환원물질 검사만으로 확진하지는 않습니다."]],
+          ["치료·관리 방법", "유형을 확인한 뒤 의료진과 영양 전문가의 지도 아래 유당과 갈락토스 섭취를 관리합니다.", ["고전형이 의심되는 영아는 의료진이 적절한 수유 방법을 신속히 결정합니다.", "성장과 영양 상태, 눈 건강, 언어와 학습 발달을 장기적으로 관찰합니다.", "필요하면 감염 등 동반 문제를 치료하고 가족에게 유전 상담을 제공합니다."]]
+        ],
+        takeaway: "갈락토스혈증은 유당불내증과 다릅니다. 특히 고전형은 신생아기에 신속한 확인과 관리가 필요한 유전성 대사질환입니다.",
+        sources: [
+          ["질병관리청 희귀질환 헬프라인", "https://helpline.kdca.go.kr/cdchelp/ph/rdiz/selectRdizInfDetail.do?rdizCd=RA201810056"],
+          ["서울아산병원 어린이병원", "https://www.amc.seoul.kr/asan/depts/child/K/bbsDetail.do?contentId=259784&menuId=4342"]
+        ]
+      },
+      {
+        id: "becker", name: "베커 근이영양증", english: "Becker muscular dystrophy", gene: "DMD", kind: "디스트로핀 관련 근육질환",
+        accent: "#386b9c",
+        summary: "DMD 유전자 변화로 디스트로핀 단백질의 기능이 줄어 근육이 점차 약해지는 질환입니다. 골격근뿐 아니라 심장 근육도 살펴야 합니다.",
+        facts: ["DMD", "X 염색체 연관 열성", "근육·심장 관리"],
+        heroPhoto: "assets/becker-hero-medical.jpg", heroAlt: "허벅지 근육 MRI 검사 장면을 표현한 의학 교육용 이미지",
+        clinicalSource: "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0150818",
+        sections: [
+          ["유전적 원인", "X 염색체의 DMD 유전자에 결실, 중복 또는 다른 병적 변화가 생겨 디스트로핀 단백질의 양이나 기능이 줄어듭니다.", ["디스트로핀은 근육 세포가 움직일 때 세포막을 안정적으로 지탱하는 데 도움을 줍니다.", "베커형에서는 디스트로핀이 일부 기능하는 경우가 많아 뒤센형보다 대체로 늦게 나타나지만 개인차가 큽니다.", "유전자 읽기 틀이 유지되는 변이가 흔하지만 모든 사례에 적용되는 절대적인 규칙은 아닙니다."]],
+          ["유전 방식", "X 염색체 연관 열성 유전으로 주로 남성에게 나타납니다.", ["남성은 X 염색체가 하나이므로 그 염색체의 DMD 유전자에 병적 변화가 있으면 영향을 받기 쉽습니다.", "여성 보인자도 근력 약화나 심장 문제가 나타날 수 있어 평가가 필요할 수 있습니다.", "가족력이 없는 새로운 유전적 변화로 생기기도 합니다."]],
+          ["주요 증상·특징", "골반과 허벅지 등 몸통에 가까운 근육의 힘이 서서히 약해지고 증상이 나타나는 나이는 다양합니다.", ["달리기, 계단 오르기, 바닥에서 일어나기가 어려워질 수 있습니다.", "종아리가 커 보이는 가성 비대는 실제 근육 기능이 좋아졌다는 뜻이 아닙니다.", "확장성 심근병증이 동반될 수 있으며, 심장 증상이 근력 약화보다 먼저 확인되기도 합니다."]],
+          ["진단 방법", "혈액에서 근육 손상을 반영하는 크레아틴키나아제(CK)를 확인하고 DMD 유전자를 검사합니다.", ["유전자 검사는 결실이나 중복뿐 아니라 다른 변이도 살펴볼 수 있습니다.", "결과가 명확하지 않으면 근육 조직의 디스트로핀을 평가하는 검사를 고려합니다.", "심전도와 심장 초음파 또는 심장 MRI, 필요에 따른 호흡 기능 평가로 동반 문제를 살핍니다."]],
+          ["치료·관리 방법", "근육 기능을 유지하고 심장 및 호흡 합병증을 예방하도록 여러 전문 분야가 함께 관리합니다.", ["재활과 관절 운동, 필요한 보조기 사용은 개인의 기능에 맞춰 결정합니다.", "심장 기능을 정기적으로 확인하고 이상이 있으면 전문의가 약물치료를 고려합니다.", "스테로이드 등 약물의 사용 여부도 환자 상태와 근거를 검토해 전문의가 결정합니다."]]
+        ],
+        takeaway: "베커형은 뒤센형보다 대체로 늦게 나타나고 진행이 느리지만, 심장 문제를 포함한 개인차가 커서 지속적인 평가가 필요합니다.",
+        sources: [
+          ["질병관리청 희귀질환 헬프라인", "https://helpline.kdca.go.kr/cdchelp/ph/rdiz/selectRdizInfDetail.do?menu=A0100&rdizCd=RA201810595"],
+          ["서울아산병원 질환백과", "https://iloveheart.amc.seoul.kr/asan/healthinfo/disease/diseaseDetail.do?contentId=32338"]
+        ]
+      },
+      {
+        id: "smith-magenis", name: "스미스-마제니스 증후군", english: "Smith-Magenis syndrome", gene: "RAI1", kind: "발달과 생체리듬의 변화",
+        accent: "#b35862",
+        summary: "17번 염색체 17p11.2 영역의 결실 또는 RAI1 유전자 변화로 발달, 학습, 수면과 행동에 영향을 받는 질환입니다.",
+        facts: ["17p11.2 / RAI1", "대부분 새 변이", "발달·수면 지원"],
+        heroPhoto: "assets/smith-magenis-hero-medical.jpg", heroAlt: "염색체 형광검사 장면을 표현한 의학 교육용 이미지",
+        clinicalSource: "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0022861",
+        sections: [
+          ["유전적 원인", "약 90%는 17번 염색체의 17p11.2 영역이 일부 결실되어 RAI1 유전자 한 사본이 사라지면서 발생합니다.", ["나머지 일부에서는 염색체 결실 없이 RAI1 유전자 자체의 병적 변화가 확인됩니다.", "RAI1은 다른 유전자의 활동을 조절하며 수면과 각성의 생체리듬에도 관련됩니다."]],
+          ["유전 방식", "상염색체 우성 원리로 설명되지만 대부분은 부모에게서 물려받지 않은 새로운 변화로 발생합니다.", ["가족력이 없어도 이 질환이 생길 수 있습니다.", "질환을 가진 부모에게서 자녀로 전달될 가능성은 임신마다 50%이지만 실제 가족 내 전달 사례는 드뭅니다.", "남녀 모두에게 나타날 수 있습니다."]],
+          ["주요 증상·특징", "발달과 언어의 지연, 학습의 어려움, 수면 주기의 변화와 행동 조절의 어려움이 함께 나타날 수 있습니다.", ["밤에 자주 깨고 이른 아침에 일어나거나 낮에 졸릴 수 있습니다.", "얼굴 형태에 특징이 나타날 수 있지만 외모만으로 진단하지는 않습니다.", "영아기 근긴장도 저하, 청력이나 시력 문제, 척추측만증 등이 동반될 수 있습니다."]],
+          ["진단 방법", "발달, 수면, 행동의 특징을 살핀 뒤 유전학적 검사로 원인을 확인합니다.", ["염색체 미세배열 검사로 17p11.2 미세결실을 확인할 수 있습니다.", "FISH 검사는 특정 부위의 결실을 확인하는 데 사용될 수 있지만 모든 유전적 원인을 찾지는 못합니다.", "결실이 확인되지 않아도 질환이 의심되면 RAI1 유전자 검사를 고려합니다."]],
+          ["치료·관리 방법", "원인을 한 번에 없애는 치료보다는 개인의 증상과 발달 단계에 맞춘 조기 지원이 중요합니다.", ["언어치료, 작업치료, 재활과 학교에서의 개별화된 학습 지원을 연결합니다.", "수면과 행동의 어려움을 평가하고 환경 조정이나 의학적 치료가 필요한지 전문의와 상의합니다.", "청력, 시력, 척추 등 동반 문제도 정기적으로 확인합니다."]]
+        ],
+        takeaway: "이 질환은 '유전질환'이지만 대부분 부모에게서 물려받은 것은 아닙니다. 새로 생긴 유전적 변화도 유전질환의 원인이 됩니다.",
+        sources: [
+          ["질병관리청 희귀질환 헬프라인", "https://helpline.kdca.go.kr/cdchelp/ph/rdiz/selectRdizInfDetail.do?fixOpenType=PRINT&rdizCd=RA201810402"],
+          ["서울아산병원 질환백과", "https://child.amc.seoul.kr/asan/healthinfo/disease/diseaseDetail.do?contentId=32411"]
+        ]
+      }
+    ];
+
+    const nav = document.querySelector(".disease-nav");
+    const panel = document.querySelector("#disease-panel");
+    const progress = document.querySelector(".reading-progress span");
+    let activeId = "";
+    let revealObserver;
+
+    function buildNavigation() {
+      nav.innerHTML = conditions.map((item, index) => `
+        <button class="disease-tab" type="button" role="tab" id="tab-${item.id}"
+          aria-controls="disease-panel" aria-selected="false" tabindex="-1" data-id="${item.id}"
+          style="--tab-accent:${item.accent}">
+          <span class="tab-number">${String(index + 1).padStart(2, "0")}</span>
+          <span class="tab-text"><span class="tab-name">${item.name}</span></span>
+        </button>`).join("");
+    }
+
+    function showCondition(id, updateHash = true) {
+      const item = conditions.find(condition => condition.id === id) || conditions[0];
+      const itemIndex = conditions.indexOf(item);
+      const next = conditions[(itemIndex + 1) % conditions.length];
+      activeId = item.id;
+      for (const tab of nav.querySelectorAll("[role=tab]")) {
+        const selected = tab.dataset.id === item.id;
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+      }
+      panel.setAttribute("aria-labelledby", `tab-${item.id}`);
+      panel.style.setProperty("--accent", item.accent);
+      document.querySelector(".reading-progress").style.setProperty("--progress-accent", item.accent);
+      panel.innerHTML = `
+        <header class="hero">
+          <div class="hero-media"><img src="${item.heroPhoto}" alt="${item.heroAlt}" width="1672" height="941"></div>
+          <div class="hero-shade" aria-hidden="true"></div>
+          <div class="hero-inner">
+            <div class="hero-topline"><span>GENETIC CONDITIONS / EXHIBIT ${String(itemIndex + 1).padStart(2, "0")}</span><span>FOUR CONDITIONS<br>ONE FIELD GUIDE</span></div>
+            <div class="hero-copy">
+              <div class="detail-kicker">${String(itemIndex + 1).padStart(2, "0")} / 04 · ${item.kind}</div>
+              <h1>${item.name}</h1>
+              <p class="english" lang="en">${item.english}</p>
+              <p class="hero-summary">${item.summary}</p>
+            </div>
+            <div class="hero-bottomline"><span class="hero-count">${String(itemIndex + 1).padStart(2, "0")} / 04</span><a class="hero-scroll" href="#information">내용 살펴보기 <span class="scroll-arrow" aria-hidden="true">↓</span></a><span class="hero-count">유전질환 탐구</span></div>
+          </div>
+        </header>
+        <p class="hero-caption">의학 교육용 생성 이미지이며 실제 환자의 검사 결과가 아닙니다. <a href="${item.clinicalSource}" target="_blank" rel="noopener noreferrer">실제 관련 검사 자료 보기</a></p>
+        <div class="facts" aria-label="질환 핵심 정보">
+          ${item.facts.map((value, index) => `<div class="fact"><span class="fact-label">${["관련 유전자", "유전 방식", "관리 초점"][index]}</span><span class="fact-value">${value}</span></div>`).join("")}
+        </div>
+        <div class="detail-body" id="information">
+        <div class="chapter-intro reveal"><span class="chapter-label">FIELD NOTES / 01—05</span><h2>한 질환을 이해하는<br>다섯 가지 관점.</h2></div>
+        <div class="section-list">
+          ${item.sections.map(([label, description, points], index) => `
+            <section class="info-section reveal" aria-labelledby="section-${item.id}-${index}">
+              <h2 id="section-${item.id}-${index}"><span class="info-number">${String(index + 1).padStart(2, "0")}</span>${label}</h2>
+              <div><p>${description}</p><ul>${points.map(point => `<li>${point}</li>`).join("")}</ul></div>
+            </section>`).join("")}
+        </div>
+        <aside class="takeaway reveal"><span class="takeaway-label">기억할 점 / TAKEAWAY</span><p>${item.takeaway}</p></aside>
+        <div class="sources"><span class="sources-label">근거 자료</span>${item.sources.map(([name, url]) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${name} ↗</a>`).join("")}</div>
+        <p class="disclaimer">학습용 요약입니다. 개인별 진단과 치료는 의료진과 상담해 결정해야 합니다.</p>
+        <button class="next-exhibit" type="button" data-next="${next.id}" aria-label="다음 질환: ${next.name}"><span class="next-label">NEXT EXHIBIT / ${String((itemIndex + 1) % conditions.length + 1).padStart(2, "0")}</span><span class="next-name">${next.name}</span><span class="next-arrow" aria-hidden="true">↗</span></button>
+        </div>`;
+      if (revealObserver) revealObserver.disconnect();
+      if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        revealObserver = new IntersectionObserver(entries => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              revealObserver.unobserve(entry.target);
+            }
+          }
+        }, { threshold: .08, rootMargin: "0px 0px -32px 0px" });
+        panel.querySelectorAll(".reveal").forEach(element => revealObserver.observe(element));
+      } else {
+        panel.querySelectorAll(".reveal").forEach(element => element.classList.add("is-visible"));
+      }
+      updateProgress();
+      document.title = `${item.name} | 유전질환 탐구`;
+      if (updateHash && location.hash !== `#${item.id}`) history.replaceState(null, "", `#${item.id}`);
+    }
+
+    nav.addEventListener("click", event => {
+      const tab = event.target.closest("[role=tab]");
+      if (tab) {
+        showCondition(tab.dataset.id);
+        window.scrollTo(0, 0);
+      }
+    });
+    panel.addEventListener("click", event => {
+      const scrollLink = event.target.closest(".hero-scroll");
+      if (scrollLink) {
+        event.preventDefault();
+        panel.querySelector("#information").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+        return;
+      }
+      const nextButton = event.target.closest("[data-next]");
+      if (!nextButton) return;
+      showCondition(nextButton.dataset.next);
+      window.scrollTo({ top: 0, behavior: "auto" });
+      document.getElementById(`tab-${activeId}`).focus({ preventScroll: true });
+    });
+    function updateProgress() {
+      const extent = document.documentElement.scrollHeight - window.innerHeight;
+      const amount = extent > 0 ? Math.min(1, window.scrollY / extent) : 0;
+      progress.style.transform = `scaleX(${amount})`;
+    }
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
+    nav.addEventListener("keydown", event => {
+      const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"];
+      if (!keys.includes(event.key)) return;
+      event.preventDefault();
+      const current = conditions.findIndex(item => item.id === activeId);
+      const next = event.key === "Home" ? 0 : event.key === "End" ? conditions.length - 1
+        : (current + ((event.key === "ArrowRight" || event.key === "ArrowDown") ? 1 : -1) + conditions.length) % conditions.length;
+      showCondition(conditions[next].id);
+      document.getElementById(`tab-${conditions[next].id}`).focus();
+      window.scrollTo(0, 0);
+    });
+    window.addEventListener("hashchange", () => {
+      showCondition(location.hash.slice(1), false);
+      window.scrollTo(0, 0);
+    });
+    buildNavigation();
+    showCondition(location.hash.slice(1), false);
+  </script>
+</body>
+</html>
